@@ -13,22 +13,6 @@ namespace Tetris
 {
     public partial class Form1 : Form
     {
-        /***********************************************************|Constructor|********************************************************/
-        public Form1()
-        {
-            InitializeComponent();
-
-            loadCanvas();
-
-            currentShape = getRandomShapeAtCenter();
-
-            timer.Tick += Timer_Tick;
-            timer.Interval = 500;
-            timer.Start();
-
-            this.KeyDown += Form1_KeyDown;
-        }
-
         /***********************************************************|Properties|*********************************************************/
         Bitmap canvasBitmap;
         Graphics canvasGraphics;
@@ -41,10 +25,30 @@ namespace Tetris
         int currentY;
 
         Shape currentShape;
+        Shape nextShape;
+
         Timer timer = new Timer();
 
-        /************************************************************|Methode|***********************************************************/
+        int score;
 
+        /***********************************************************|Constructor|********************************************************/
+        public Form1()
+        {
+            InitializeComponent();
+
+            loadCanvas();
+
+            currentShape = getRandomShapeAtCenter();
+            nextShape = getNextShape();
+
+            timer.Tick += Timer_Tick;
+            timer.Interval = 500;
+            timer.Start();
+
+            this.KeyDown += Form1_KeyDown;
+        }
+
+        /************************************************************|Methode|***********************************************************/
         // Canvas
         private void loadCanvas()
         {
@@ -180,7 +184,12 @@ namespace Tetris
                 updateCanvasDotArrayWithCurrentShape();
 
                 // get de la forme suivante
-                currentShape = getRandomShapeAtCenter();
+                /*currentShape = getRandomShapeAtCenter();*/
+                currentShape = nextShape;
+                nextShape = getNextShape();
+
+                clearFilledRowsAndUpdateScore();
+
             }
         }
 
@@ -223,5 +232,79 @@ namespace Tetris
                 currentShape.rollback();
         }
 
+        public void clearFilledRowsAndUpdateScore()
+        {
+            // check through each rows
+            for (int i = 0; i < canvasHeight; i++) {
+                int j;
+                for (j = canvasWidth - 1; j >= 0; j--) {
+                    if (canvasDotArray[j, i] == 0)
+                        break;
+                }
+
+                if (j == -1) {
+                    // update score and level values and labels
+                    score++;
+                    label_Score.Text = "Score: " + score;
+                    label_Level.Text = "Level: " + score / 10;
+                    // increase the speed 
+                    timer.Interval -= 10;
+
+                    // update the dot array based on the check
+                    for (j = 0; j < canvasWidth; j++) {
+                        for (int k = i; k > 0; k--) {
+                            canvasDotArray[j, k] = canvasDotArray[j, k - 1];
+                        }
+
+                        canvasDotArray[j, 0] = 0;
+                    }
+                }
+            }
+
+            // Draw panel based on the updated array values
+            for (int i = 0; i < canvasWidth; i++) {
+                for (int j = 0; j < canvasHeight; j++) {
+                    canvasGraphics = Graphics.FromImage(canvasBitmap);
+                    canvasGraphics.FillRectangle(
+                        canvasDotArray[i, j] == 1 ? Brushes.Black : Brushes.LightGray,
+                        i * pointSize, j * pointSize, pointSize, pointSize
+                        );
+                }
+            }
+
+            pictureBox_Game.Image = canvasBitmap;
+        }
+
+        // Afficher 
+        Bitmap nextShapeBitmap;
+        Graphics nextShapeGraphics;
+
+        private Shape getNextShape()
+        {
+            var shape = getRandomShapeAtCenter();
+
+            // Codes to show the next shape in the side panel
+            nextShapeBitmap = new Bitmap(6 * pointSize, 6 * pointSize);
+            nextShapeGraphics = Graphics.FromImage(nextShapeBitmap);
+
+            nextShapeGraphics.FillRectangle(Brushes.LightGray, 0, 0, nextShapeBitmap.Width, nextShapeBitmap.Height);
+
+            // Find the ideal position for the shape in the side panel
+            var startX = (6 - shape.width) / 2;
+            var startY = (6 - shape.height) / 2;
+
+            for (int i = 0; i < shape.height; i++) {
+                for (int j = 0; j < shape.width; j++) {
+                    nextShapeGraphics.FillRectangle(
+                        shape.points[i, j] == 1 ? Brushes.Black : Brushes.LightGray,
+                        (startX + j) * pointSize, (startY + i) * pointSize, pointSize, pointSize);
+                }
+            }
+
+            pictureBox_Next_Shape.Size = nextShapeBitmap.Size;
+            pictureBox_Next_Shape.Image = nextShapeBitmap;
+
+            return shape;
+        }
     }
 }
