@@ -23,12 +23,13 @@ namespace Tetris
             currentShape = getRandomShapeAtCenter();
 
             timer.Tick += Timer_Tick;
-            timer.Interval = 20;
+            timer.Interval = 500;
             timer.Start();
+
+            this.KeyDown += Form1_KeyDown;
         }
 
         /***********************************************************|Properties|*********************************************************/
-
         Bitmap canvasBitmap;
         Graphics canvasGraphics;
 
@@ -48,18 +49,18 @@ namespace Tetris
         private void loadCanvas()
         {
             // Resize le picture box
-            pictureBox1.Width = canvasWidth * pointSize;
-            pictureBox1.Height = canvasHeight * pointSize;
+            pictureBox_Game.Width = canvasWidth * pointSize;
+            pictureBox_Game.Height = canvasHeight * pointSize;
 
             // Creer Bitmap avec la taille de picture box
-            canvasBitmap = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+            canvasBitmap = new Bitmap(pictureBox_Game.Width, pictureBox_Game.Height);
 
             canvasGraphics = Graphics.FromImage(canvasBitmap);
 
             canvasGraphics.FillRectangle(Brushes.LightGray, 0, 0, canvasBitmap.Width, canvasBitmap.Height);
 
             // Charger le bitmap dans picture box
-            pictureBox1.Image = canvasBitmap;
+            pictureBox_Game.Image = canvasBitmap;
 
             // Init tab
             canvasDotArray = new int[canvasWidth, canvasHeight];
@@ -71,6 +72,16 @@ namespace Tetris
         }
 
         private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Score_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label1_Click(object sender, EventArgs e)
         {
 
         }
@@ -88,17 +99,17 @@ namespace Tetris
         }
 
         // Return si curentForme touche une forme ou le sol
-        private bool moveShapeIfPossible(int moveDown = 0, int moveSide = 0)
+        private bool moveShape(int moveDown = 0, int moveSide = 0)
         {
             var newX = currentX + moveSide;
             var newY = currentY + moveDown;
 
-            // check if it reaches the bottom or side bar
+            // Si touche le sol
             if (newX < 0 || newX + currentShape.width > canvasWidth
                 || newY + currentShape.height > canvasHeight)
                 return false;
 
-            // check if it touches any other blocks 
+            // Si touche une forme
             for (int i = 0; i < currentShape.width; i++) {
                 for (int j = 0; j < currentShape.height; j++) {
                     if (newY + j > 0 && canvasDotArray[newX + i, newY + j] == 1 && currentShape.points[j, i] == 1)
@@ -132,7 +143,7 @@ namespace Tetris
                 }
             }
 
-            pictureBox1.Image = workBitmap;
+            pictureBox_Game.Image = workBitmap;
         }
 
         private void updateCanvasDotArrayWithCurrentShape()
@@ -159,18 +170,57 @@ namespace Tetris
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            var isMoveSuccess = moveShapeIfPossible(moveDown: 1);
+            var isMoveSuccess = moveShape(moveDown: 1);
 
-            // if shape reached bottom or touched any other shapes
+            // Si touche le bot ou une autre forme
             if (!isMoveSuccess) {
-                // copy working image into canvas image
+                
                 canvasBitmap = new Bitmap(workBitmap);
 
                 updateCanvasDotArrayWithCurrentShape();
 
-                // get next shape
+                // get de la forme suivante
                 currentShape = getRandomShapeAtCenter();
             }
+        }
+
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            var verticalMove = 0;
+            var horizontalMove = 0;
+
+            // Bouger horizontalement et verticalement 
+            switch (e.KeyCode) {
+                // move gauche
+                case Keys.Left:
+                    verticalMove--;
+                    break;
+
+                // move droite
+                case Keys.Right:
+                    verticalMove++;
+                    break;
+
+                // move vers le bas (acceleration)
+                case Keys.Down:
+                    horizontalMove++;
+                    break;
+
+                // rotate la shape
+                case Keys.Up:
+                    currentShape.turn();
+                    break;
+
+                default:
+                    return;
+            }
+
+            var isMoveSuccess = moveShape(horizontalMove, verticalMove);
+
+            // Lorsque la rotate n'est pas possible
+            // car touche une autre forme
+            if (!isMoveSuccess && e.KeyCode == Keys.Up)
+                currentShape.rollback();
         }
 
     }

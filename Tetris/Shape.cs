@@ -28,8 +28,8 @@ namespace Tetris
             height = temp;
         }
 
-        // the rolling back occurs when player rotating the shape
-        // but it will touch other shapes and needs to be rolled back
+        // Lorsque la rotate n'est pas possible
+        // car touche une autre forme
         public void rollback()
         {
             points = tempPoints;
