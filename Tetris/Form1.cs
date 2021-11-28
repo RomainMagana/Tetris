@@ -275,7 +275,7 @@ namespace Tetris
             pictureBox_Game.Image = canvasBitmap;
         }
 
-        // Afficher 
+        // Afficher la forme qui suit
         Bitmap nextShapeBitmap;
         Graphics nextShapeGraphics;
 
