@@ -31,7 +31,7 @@ namespace Tetris
 
         int score;
 
-        System.Media.SoundPlayer musique = new System.Media.SoundPlayer(@"C:\Users\bianc\source\repos\RomainMagana\Tetris\Tetris\assets\main_theme.wav");
+        System.Media.SoundPlayer musique = new System.Media.SoundPlayer(@"C:\Users\romai\Desktop\Tetris\Tetris\assets\main_theme.wav");
        
 
         /***********************************************************|Constructor|********************************************************/
