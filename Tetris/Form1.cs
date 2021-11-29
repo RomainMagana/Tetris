@@ -31,7 +31,7 @@ namespace Tetris
 
         int score;
 
-        System.Media.SoundPlayer musique = new System.Media.SoundPlayer(@"C:\Users\romai\Desktop\Tetris\Tetris\assets\main_theme.wav");
+        System.Media.SoundPlayer musique = new System.Media.SoundPlayer(@"..\\..\\assets\\main_theme.wav");
        
 
         /***********************************************************|Constructor|********************************************************/
@@ -241,8 +241,8 @@ namespace Tetris
         // Score
         public void clearFilledRowsAndUpdateScore()
         {
-            // Verifier la ligne
             for (int i = 0; i < canvasHeight; i++) {
+                // Verifier la ligne
                 int j;
                 for (j = canvasWidth - 1; j >= 0; j--) {
                     if (canvasDotArray[j, i] == 0)
@@ -252,7 +252,7 @@ namespace Tetris
                 if (j == -1) {
                     score++;
                     label_Score.Text = "Score: " + score;
-                    label_Level.Text = "Level: " + score / 10;
+                    label_Level.Text = "Level: " + score / 5;
 
                     // Augmente vitesse
                     timer.Interval -= 10;
