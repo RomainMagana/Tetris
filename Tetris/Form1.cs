@@ -31,6 +31,9 @@ namespace Tetris
 
         int score;
 
+        System.Media.SoundPlayer musique = new System.Media.SoundPlayer(@"C:\Users\bianc\source\repos\RomainMagana\Tetris\Tetris\assets\main_theme.wav");
+       
+
         /***********************************************************|Constructor|********************************************************/
         public Form1()
         {
@@ -43,7 +46,10 @@ namespace Tetris
 
             timer.Tick += Timer_Tick;
             timer.Interval = 500;
-            timer.Start();
+            timer.Start();   
+
+
+            musique.Play();
 
             this.KeyDown += Form1_KeyDown;
         }
