@@ -12,7 +12,7 @@ namespace Tetris
 
         public void turn()
         {
-            // Backup de points
+            // Tempon de points
             tempPoints = points;
 
             points = new int[width, height];

@@ -129,7 +129,6 @@ namespace Tetris
             return true;
         }
 
-
         // Shape
         Bitmap workBitmap;
         Graphics workGraphics;
@@ -193,6 +192,7 @@ namespace Tetris
             }
         }
 
+        // Deplacements
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             var verticalMove = 0;
@@ -202,17 +202,17 @@ namespace Tetris
             switch (e.KeyCode) {
                 // move gauche
                 case Keys.Left:
-                    verticalMove--;
+                    horizontalMove--;
                     break;
 
                 // move droite
                 case Keys.Right:
-                    verticalMove++;
+                    horizontalMove++;
                     break;
 
                 // move vers le bas (acceleration)
                 case Keys.Down:
-                    horizontalMove++;
+                    verticalMove++;
                     break;
 
                 // rotate la shape
@@ -224,7 +224,7 @@ namespace Tetris
                     return;
             }
 
-            var isMoveSuccess = moveShape(horizontalMove, verticalMove);
+            var isMoveSuccess = moveShape(verticalMove, horizontalMove);
 
             // Lorsque la rotate n'est pas possible
             // car touche une autre forme
@@ -232,9 +232,10 @@ namespace Tetris
                 currentShape.rollback();
         }
 
+        // Score
         public void clearFilledRowsAndUpdateScore()
         {
-            // check through each rows
+            // Verifier la ligne
             for (int i = 0; i < canvasHeight; i++) {
                 int j;
                 for (j = canvasWidth - 1; j >= 0; j--) {
@@ -243,14 +244,14 @@ namespace Tetris
                 }
 
                 if (j == -1) {
-                    // update score and level values and labels
                     score++;
                     label_Score.Text = "Score: " + score;
                     label_Level.Text = "Level: " + score / 10;
-                    // increase the speed 
+
+                    // Augmente vitesse
                     timer.Interval -= 10;
 
-                    // update the dot array based on the check
+                    // Mettre a jour le tableau de points
                     for (j = 0; j < canvasWidth; j++) {
                         for (int k = i; k > 0; k--) {
                             canvasDotArray[j, k] = canvasDotArray[j, k - 1];
@@ -261,14 +262,11 @@ namespace Tetris
                 }
             }
 
-            // Draw panel based on the updated array values
+            // Redessiner le tableau en fonction du nouveau
             for (int i = 0; i < canvasWidth; i++) {
                 for (int j = 0; j < canvasHeight; j++) {
                     canvasGraphics = Graphics.FromImage(canvasBitmap);
-                    canvasGraphics.FillRectangle(
-                        canvasDotArray[i, j] == 1 ? Brushes.Black : Brushes.LightGray,
-                        i * pointSize, j * pointSize, pointSize, pointSize
-                        );
+                    canvasGraphics.FillRectangle( canvasDotArray[i, j] == 1 ? Brushes.Red : Brushes.LightGray, i * pointSize, j * pointSize, pointSize, pointSize );
                 }
             }
 
@@ -296,7 +294,7 @@ namespace Tetris
             for (int i = 0; i < shape.height; i++) {
                 for (int j = 0; j < shape.width; j++) {
                     nextShapeGraphics.FillRectangle(
-                        shape.points[i, j] == 1 ? Brushes.Black : Brushes.LightGray,
+                        shape.points[i, j] == 1 ? Brushes.Red : Brushes.LightGray,
                         (startX + j) * pointSize, (startY + i) * pointSize, pointSize, pointSize);
                 }
             }
